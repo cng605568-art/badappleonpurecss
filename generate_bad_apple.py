@@ -12,9 +12,9 @@ AUDIO_FILE = 'bad_apple.mp3'
 OUTPUT_HTML = 'index.html'
 OUTPUT_SPRITE = 'spritesheet.webp'
 
-TARGET_FPS = 30        # UPGRADED: Full 30 FPS for buttery smooth motion
-FRAME_W = 160          # UPGRADED: 2x Width
-FRAME_H = 120          # UPGRADED: 2x Height
+TARGET_FPS = 30        # Full 30 FPS for buttery smooth motion
+FRAME_W = 160          # 2x Width
+FRAME_H = 120          # 2x Height
 COLS = 100             # GRID MAXED: 100 cols * 160px = 16,000px width (WebP limit is 16383px)
 SCALE = 6              # Outputs a massive 960x720 video player in the browser
 
@@ -41,12 +41,10 @@ def main():
             break
         
         if current_frame in frames_to_extract:
-            # Convert to grayscale and resize
             gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
             resized = cv2.resize(gray, (FRAME_W, FRAME_H))
             
-            # UPGRADE: We removed the strict binary threshold to keep smooth, 
-            # anti-aliased grayscale edges for superior visual quality.
+            # Keeps smooth, anti-aliased grayscale edges for superior visual quality
             extracted_images.append(Image.fromarray(resized))
             
             if len(extracted_images) % 500 == 0:
@@ -78,10 +76,9 @@ def main():
         spritesheet.paste(img, (x, y))
 
     print(f"Saving {sheet_w}x{sheet_h} WebP (This will take some time and RAM)...")
-    # UPGRADE: Quality bumped to 90 for better grayscale artifact suppression
     spritesheet.save(OUTPUT_SPRITE, quality=90, method=6)
 
-    print("\nStep 3: Compiling HTML/CSS...")
+    print("\nStep 3: Compiling strict iteration HTML/CSS...")
     html_content = f"""<!DOCTYPE html>
 <html lang="en">
 <head>
@@ -132,15 +129,19 @@ def main():
             background-repeat: no-repeat;
             background-position: 0px 0px;
             
-            /* UPGRADE: Removed pixelated rendering so the browser smooths the grayscale edges */
             image-rendering: auto; 
             
             transform: scale(var(--scale));
             transform-origin: center;
             
+            /* 
+               FIX APPLIED: 
+               - animX runs exactly var(--rows) times, then stops (forwards).
+               - animY runs exactly 1 time over the total duration, then stops (forwards).
+            */
             animation: 
-                animX var(--row-duration) steps(var(--cols), end) infinite,
-                animY var(--total-duration) steps(var(--rows), end) infinite;
+                animX var(--row-duration) steps(var(--cols), end) var(--rows) forwards,
+                animY var(--total-duration) steps(var(--rows), end) 1 forwards;
             
             animation-play-state: paused;
         }}
@@ -199,7 +200,7 @@ def main():
     with open(OUTPUT_HTML, 'w', encoding='utf-8') as f:
         f.write(html_content)
 
-    print("\nSUCCESS! Max-Quality Pipeline complete.")
+    print("\nSUCCESS! Pipeline complete.")
     print(f"Generated {OUTPUT_SPRITE} and {OUTPUT_HTML}.")
 
 if __name__ == '__main__':

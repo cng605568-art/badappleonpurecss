@@ -48,15 +48,19 @@
             background-repeat: no-repeat;
             background-position: 0px 0px;
             
-            /* UPGRADE: Removed pixelated rendering so the browser smooths the grayscale edges */
             image-rendering: auto; 
             
             transform: scale(var(--scale));
             transform-origin: center;
             
+            /* 
+               FIX APPLIED: 
+               - animX runs exactly var(--rows) times, then stops (forwards).
+               - animY runs exactly 1 time over the total duration, then stops (forwards).
+            */
             animation: 
-                animX var(--row-duration) steps(var(--cols), end) infinite,
-                animY var(--total-duration) steps(var(--rows), end) infinite;
+                animX var(--row-duration) steps(var(--cols), end) var(--rows) forwards,
+                animY var(--total-duration) steps(var(--rows), end) 1 forwards;
             
             animation-play-state: paused;
         }
