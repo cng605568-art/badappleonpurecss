@@ -3,17 +3,16 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>CSS Bad Apple!! (Micro-JS Sync)</title>
+    <title>CSS Bad Apple!!</title>
     <style>
         :root {
-            --frame-w: 80px;
-            --frame-h: 60px;
-            --scale: 8;
-            --cols: 50;
-            --rows: 44;
-            --fps: 10;
+            --frame-w: 160px;
+            --frame-h: 120px;
+            --scale: 6;
+            --cols: 100;
+            --rows: 66;
+            --fps: 30;
             
-            /* Timing Calcs */
             --row-duration: calc(var(--cols) / var(--fps) * 1s);
             --total-duration: calc(var(--rows) * var(--row-duration));
         }
@@ -28,7 +27,6 @@
             margin-top: 40px;
         }
 
-        /* The UI Wrapper */
         .tv-wrapper {
             width: calc(var(--frame-w) * var(--scale));
             height: calc(var(--frame-h) * var(--scale));
@@ -42,7 +40,6 @@
             align-items: center;
         }
 
-        /* The CSS Render Engine */
         .screen {
             width: var(--frame-w);
             height: var(--frame-h);
@@ -50,11 +47,13 @@
             background-size: calc(var(--frame-w) * var(--cols)) calc(var(--frame-h) * var(--rows));
             background-repeat: no-repeat;
             background-position: 0px 0px;
-            image-rendering: pixelated; 
+            
+            /* UPGRADE: Removed pixelated rendering so the browser smooths the grayscale edges */
+            image-rendering: auto; 
+            
             transform: scale(var(--scale));
             transform-origin: center;
             
-            /* NESTED KEYFRAMES: 2D Step Matrix */
             animation: 
                 animX var(--row-duration) steps(var(--cols), end) infinite,
                 animY var(--total-duration) steps(var(--rows), end) infinite;
@@ -71,7 +70,6 @@
             100% { background-position-y: calc(-1 * var(--frame-h) * var(--rows)); }
         }
 
-        /* Checkbox Logic */
         #play-trigger { display: none; }
         
         #play-trigger:checked ~ .tv-wrapper .screen {
@@ -92,21 +90,12 @@
             box-shadow: 0 4px 15px rgba(255, 255, 255, 0.1);
         }
 
-        p.info {
-            font-size: 0.9em;
-            color: #aaa;
-            max-width: 600px;
-            text-align: center;
-            margin-top: 20px;
-        }
-
     </style>
 </head>
 <body>
 
     <h1>CSS Bad Apple!!</h1>
 
-    <!-- Hidden state checkbox -->
     <input type="checkbox" id="play-trigger">
 
     <div class="tv-wrapper">
@@ -114,16 +103,11 @@
     </div>
 
     <div class="controls">
-        <!-- Micro-JS inline events to toggle the CSS animation automatically -->
         <audio id="audio" controls src="bad_apple.mp3" 
                onplay="document.getElementById('play-trigger').checked = true;" 
                onpause="document.getElementById('play-trigger').checked = false;">
         </audio>
     </div>
-
-    <p class="info">
-        <strong>Micro-JS Enabled:</strong> The native HTML5 audio element uses simple inline <code>onplay</code> and <code>onpause</code> events to instantly trigger the CSS keyframes checkbox state.
-    </p>
 
 </body>
 </html>
